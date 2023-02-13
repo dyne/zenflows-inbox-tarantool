@@ -3,15 +3,15 @@ import sign from "./sign_graphql.mjs"
 import { zencode_exec } from 'zenroom';
 import axios from 'axios';
 
-const PIPPO_EDDSA = "AEkxhh4aFV1eG88FY8LjZSMyJXgmynUdWzUPV6tCHwqn"
-const PIPPO_ID = "0620YFM3DCC74PEK6VYH32EF10"
-const PLUTO_EDDSA = "6M3sJz56689qf67xhKyfT3Lf19eiq1xWXhmtzBipdW3n"
-const PLUTO_ID = "061TQRJG3RP9YN9HVXH6BMXK5W"
-const PAPERINO_EDDSA = "88XLEXAkTdxdm4r8V5gYFPQxvqgMvWu4EHXKSMbXenzC"
-const PAPERINO_ID = "0620WKRGKNHDVRHGFYWPYM0GQ0"
+const PIPPO_EDDSA = "EtJtSqAG9mVHfKrKduS6aeyAE6okGXrfMW8fEQ6eqenh"
+const PIPPO_ID = "062TE0H7591KJCVT3DDEMDBF0R"
+const PLUTO_EDDSA = "2n4TEhoQ8ZwedJoUuJNbxv5W1cr5wHFYPcQmkk1EWj4t"
+const PLUTO_ID = "062TE0YPJD392CS1DPV9XWMDXC"
+const PAPERINO_EDDSA = "H7sbugVBZbmRX6M75WpzCi5vVVtaxvfLhovDijRAnZj"
+const PAPERINO_ID = "062TE18QJSQJ1PY6G1M7783148"
 
-//const url="http://localhost:5000"
-const url="https://gateway0.interfacer.dyne.org/inbox"
+const url="http://localhost:5000"
+//const url="https://gateway0.interfacer.dyne.org/inbox"
 
 const signRequest = async (json, key) => {
 	const data = `{"gql": "${Buffer.from(json, 'utf8').toString('base64')}"}`
@@ -45,6 +45,7 @@ const sendMessage = async (message) => {
 const assertPostMany = async() => {
     for(let i=0; i<10; i++) {
         const res = await sendMessage(`Ciao a tutti ${i}`)
+    console.log(res)
 
         console.assert(res.data.success)
         console.assert(res.data.count == 2)
@@ -108,8 +109,24 @@ const countMessages = async(receiver, key) => {
     const result = await axios.post(`${url}/count-unread`, request, config);
     return result
 }
-//await assertPostMany()
+
+const deleteMessage = async(receiver, messageId, key) => {
+    const request = {
+        receiver,
+        message_id: messageId,
+    }
+    const requestJSON = JSON.stringify(request)
+    const requestHeaders =  await signRequest(requestJSON, key);
+    const config = {
+        headers: requestHeaders
+    };
+
+    const result = await axios.post(`${url}/delete`, request, config);
+    return result
+}
+await assertPostMany()
 assertReadMany(PLUTO_ID, PLUTO_EDDSA)
 //assertReadMany(PAPERINO_ID, PAPERINO_EDDSA)
 //setMessage(10, PLUTO_ID, true, PLUTO_EDDSA)
 //console.log(await countMessages(PLUTO_ID, PLUTO_EDDSA))
+//deleteMessage(PLUTO_ID, 18, PLUTO_EDDSA)

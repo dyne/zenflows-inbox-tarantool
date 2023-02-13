@@ -1,0 +1,5 @@
+FROM node:18-bullseye
+WORKDIR /app
+ADD examples .
+RUN apt update && apt install -y iputils-ping vim net-tools && yarn
+CMD [ "/bin/bash" ]

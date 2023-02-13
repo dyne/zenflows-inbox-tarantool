@@ -1,17 +1,13 @@
-version: "2"
+version: "3"
 services:
-  inbox:
-      build: .
-      working_dir: /app
-      ports:
-        - "5000:80"
-      environment:
-        DB_URL: "postgresql://inbox:password@db:5432/inbox?sslmode=disable"
-      depends_on:
-        - db
   db:
-    image: postgres
+    build:
+      dockerfile: Dockerfile.tarantool
+      context: .
     restart: always
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: inbox
+    ports:
+      - 3500:3500
+    volumes:
+      - tt_data:/var/lib/tarantool
+volumes:
+  tt_data:

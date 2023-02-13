@@ -1,0 +1,61 @@
+version: "3"
+services:
+  inbox0:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: zenflows-inbox
+    working_dir: /app
+    ports:
+      - "5000:80"
+    environment:
+      TT_HOST: "db0:3500"
+      TT_USER: "inbox"
+      TT_PASS: "inbox"
+      ZENFLOWS_URL: "https://zenflows-test.interfacer.dyne.org"
+      BASE_URL: "http://inbox0"
+      ZENFLOWS_SK:
+      ZENFLOWS_USER:
+    depends_on:
+      - db0
+  db0:
+    build:
+      dockerfile: Dockerfile.tarantool
+      context: .
+    image: zenflows-inbox-db
+    restart: always
+    ports:
+      - 3500:3500
+  inbox1:
+    image: zenflows-inbox
+    working_dir: /app
+    ports:
+      - "5001:80"
+    environment:
+      TT_HOST: "db1:3500"
+      TT_USER: "inbox"
+      TT_PASS: "inbox"
+      ZENFLOWS_URL: "https://zenflows-test.interfacer.dyne.org"
+      BASE_URL: "http://inbox1"
+      ZENFLOWS_SK:
+      ZENFLOWS_USER:
+    depends_on:
+      - db1
+      - inbox0
+  db1:
+    image: zenflows-inbox-db
+    restart: always
+    ports:
+      - 3501:3500
+    depends_on:
+      - db0
+  client:
+    build:
+      dockerfile: Dockerfile.examples
+      context: .
+    command: /bin/sh
+    restart: always
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    logging:
+      driver: none
